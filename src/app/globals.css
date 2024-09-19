@@ -1,0 +1,127 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+@layer base {
+  :root {
+    --background: 217 17% 95%;
+    --foreground: 217 5% 10%;
+    --card: 217 17% 90%;
+    --card-foreground: 217 5% 15%;
+    --popover: 217 17% 95%;
+    --popover-foreground: 217 95% 10%;
+    --primary: 217 45% 27%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 217 17% 74%;
+    --secondary-foreground: 0 0% 0%;
+    --muted: 179 17% 85%;
+    --muted-foreground: 217 5% 40%;
+    --accent: 179 17% 80%;
+    --accent-foreground: 217 5% 15%;
+    --destructive: 0 60% 51%;
+    --destructive-foreground: 217 5% 90%;
+    --border: 217 20% 74%;
+    --input: 217 20% 50%;
+    --ring: 217 45% 27%;
+    --radius: 0.5rem;
+    --warning: 38 92% 50%;
+    --warning-foreground: 48 96% 89%;
+  }
+  .dark {
+    --background: 217 39% 10%;
+    --foreground: 217 5% 90%;
+    --card: 217 39% 10%;
+    --card-foreground: 217 5% 90%;
+    --popover: 217 39% 5%;
+    --popover-foreground: 217 5% 90%;
+    --primary: 217 45% 27%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 217 30% 20%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 179 30% 22%;
+    --muted-foreground: 217 5% 60%;
+    --accent: 179 30% 22%;
+    --accent-foreground: 217 5% 90%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 217 5% 90%;
+    --border: 217 30% 22%;
+    --input: 217 30% 22%;
+    --ring: 217 45% 27%;
+    --radius: 0.5rem;
+    --warning: 48 96% 89%;
+    --warning-foreground: 38 92% 50%;
+  }
+}
+
+@layer utilities {
+  .force-light-mode {
+    /* Reset all color variables to their light mode values */
+    --background: 217 17% 95%;
+    --foreground: 217 5% 10%;
+    --card: 217 17% 90%;
+    --card-foreground: 217 5% 15%;
+    --popover: 217 17% 95%;
+    --popover-foreground: 217 95% 10%;
+    --primary: 217 45% 27%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 217 17% 74%;
+    --secondary-foreground: 0 0% 0%;
+    --muted: 179 17% 85%;
+    --muted-foreground: 217 5% 40%;
+    --accent: 179 17% 80%;
+    --accent-foreground: 217 5% 15%;
+    --destructive: 0 60% 51%;
+    --destructive-foreground: 217 5% 90%;
+    --border: 217 20% 74%;
+    --input: 217 20% 50%;
+    --ring: 217 45% 27%;
+    --radius: 0.5rem;
+    --warning: 38 92% 50%;
+    --warning-foreground: 48 96% 89%;
+
+    /* Force color-scheme to light */
+    color-scheme: light;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: rgba(var(--color-primary), 0.2);
+    border-radius: 3px;
+  }
+}

@@ -1,0 +1,13 @@
+services:
+  resticprofile-ui:
+    image: militu/resticprofile-ui:latest
+    build: .
+    volumes:
+      - ${DB_PATH:-./data}:/app/data
+      - ${HOME}/.ssh:/home/node/.ssh:ro
+    environment:
+      - AUTH_SECRET=${AUTH_SECRET:?err}
+      - PUBLIC_SITE_TITLE=${PUBLIC_SITE_TITLE:-resticprofile-ui}
+    ports:
+      - "${PORT:-3000}:3000"
+    restart: unless-stopped
