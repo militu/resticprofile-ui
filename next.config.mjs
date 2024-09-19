@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // output: "standalone",
+  output: "standalone",
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
