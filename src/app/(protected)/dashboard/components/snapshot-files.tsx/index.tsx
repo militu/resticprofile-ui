@@ -1,7 +1,7 @@
 import { fetchSnapshotFiles } from "@/actions/fetchSnapshotFiles";
 import { ServerConfig } from "@/types";
-import { DataTableContainer } from "../table/data-table-container";
-import { SnapshotFilesTable } from "./snapshot-files-table";
+import AlertMessage from "../alert-message";
+import SnapshotFilesDisplayClient from "./client";
 
 interface SnapshotFilesProps {
   serverConfig: ServerConfig;
@@ -14,20 +14,34 @@ export default async function SnapshotFiles({
   profileName,
   snapshotId,
 }: SnapshotFilesProps) {
-  const actionResponse = await fetchSnapshotFiles(
+  const snapshotFilesResponse = await fetchSnapshotFiles(
     serverConfig,
     profileName,
     snapshotId
   );
 
+  if (!snapshotFilesResponse.success) {
+    return (
+      <AlertMessage
+        message={snapshotFilesResponse.error || "Unexpected error"}
+        type="error"
+      />
+    );
+  }
+
+  if (!snapshotFilesResponse.data || snapshotFilesResponse.data.length === 0) {
+    return (
+      <AlertMessage
+        message="There are no snapshot files available for the selected snapshot."
+        type="warning"
+      />
+    );
+  }
+
   return (
-    <DataTableContainer
-      title={`Snapshot files for ${profileName}`}
-      isLoading={false}
-      actionResponse={actionResponse}
-      emptyMessage="There are no snapshot files available for the selected snapshot."
-    >
-      {(data) => <SnapshotFilesTable data={data} />}
-    </DataTableContainer>
+    <SnapshotFilesDisplayClient
+      files={snapshotFilesResponse.data}
+      title={`Browsing files in snapshot "${snapshotId.substring(0, 8)}"`}
+    />
   );
 }
