@@ -7,13 +7,13 @@ import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { ReactNode, Suspense } from "react";
 import AlertMessage from "./alert-message";
+import { DataTableSkeleton } from "./common/data-table-skeleton";
 import renderErrorCard from "./error-cards";
 import { ProfilePage } from "./profile-page";
 import { ProfilePageSkeleton } from "./profile-page/skeleton";
 import renderProfileSelectionPrompt from "./profile-selection-prompt";
 import { SidebarSkeleton } from "./sidebar/sidebar-skeleton";
 import SnapshotFiles from "./snapshot-files.tsx";
-import { DataTableSkeleton } from "./table/data-table-skeleton";
 import WithSidebar from "./with-sidebar";
 
 interface MainContentPageProps {

@@ -20,7 +20,7 @@ export async function fetchSnapshotFiles(
 
     return {
       success: true,
-      data: result.slice(1),
+      data: result,
     };
   } catch (err) {
     return handleActionError(err);

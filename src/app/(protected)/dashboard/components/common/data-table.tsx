@@ -1,5 +1,3 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -16,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { SnapshotFile } from "@/lib/parsers/parseSnapshotFilesOutput";
+import { ChevronDownIcon } from "@radix-ui/react-icons";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -28,58 +26,26 @@ import {
   SortingState,
   useReactTable,
 } from "@tanstack/react-table";
-import { ChevronDown } from "lucide-react";
-import * as React from "react";
+import { useState } from "react";
 
-const columns: ColumnDef<SnapshotFile>[] = [
-  {
-    accessorKey: "name",
-    header: "Name",
-  },
-  {
-    accessorKey: "type",
-    header: "Type",
-  },
-  {
-    accessorKey: "path",
-    header: "Path",
-  },
-  {
-    accessorKey: "size",
-    header: "Size",
-    cell: ({ row }) => <div>{formatBytes(row.getValue("size"))}</div>,
-  },
-  {
-    accessorKey: "permissions",
-    header: "Permissions",
-  },
-  {
-    accessorKey: "mtime",
-    header: "Modified Time",
-    cell: ({ row }) => (
-      <div>{new Date(row.getValue("mtime")).toLocaleString()}</div>
-    ),
-  },
-];
-
-function formatBytes(bytes: number): string {
-  if (bytes === 0) return "0 Bytes";
-  const k = 1024;
-  const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+interface DataTableProps<TData, TValue> {
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
+  onRowClick?: (row: TData) => void;
+  filterColumn?: string;
+  isRowClickable?: (row: TData) => boolean;
 }
 
-interface SnapshotFilesTableProps {
-  data: SnapshotFile[];
-}
-
-export function SnapshotFilesTable({ data }: SnapshotFilesTableProps) {
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
-  const [columnVisibility, setColumnVisibility] = React.useState({});
+export function DataTable<TData, TValue>({
+  columns,
+  data,
+  onRowClick,
+  filterColumn,
+  isRowClickable,
+}: DataTableProps<TData, TValue>) {
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = useState({});
 
   const table = useReactTable({
     data,
@@ -98,27 +64,45 @@ export function SnapshotFilesTable({ data }: SnapshotFilesTableProps) {
     },
   });
 
+  const getColumnLabel = (column: any) => {
+    if (typeof column.columnDef.header === "string") {
+      return column.columnDef.header;
+    } else if (column.columnDef.meta?.label) {
+      return column.columnDef.meta.label;
+    } else {
+      return column.id;
+    }
+  };
+
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
-        <Input
-          placeholder="Filter files..."
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("name")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
+        {filterColumn && (
+          <Input
+            placeholder={`Filter ${filterColumn}...`}
+            value={
+              (table.getColumn(filterColumn)?.getFilterValue() as string) ?? ""
+            }
+            onChange={(event) =>
+              table.getColumn(filterColumn)?.setFilterValue(event.target.value)
+            }
+            className="max-w-sm"
+          />
+        )}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
-              Columns <ChevronDown className="ml-2 h-4 w-4" />
+              Columns <ChevronDownIcon className="ml-2 h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             {table
               .getAllColumns()
-              .filter((column) => column.getCanHide())
+              .filter(
+                (column) =>
+                  column.getCanHide() &&
+                  column.columnDef.meta?.toggleable !== false
+              )
               .map((column) => {
                 return (
                   <DropdownMenuCheckboxItem
@@ -129,7 +113,7 @@ export function SnapshotFilesTable({ data }: SnapshotFilesTableProps) {
                       column.toggleVisibility(!!value)
                     }
                   >
-                    {column.id}
+                    {getColumnLabel(column)}
                   </DropdownMenuCheckboxItem>
                 );
               })}
@@ -143,7 +127,10 @@ export function SnapshotFilesTable({ data }: SnapshotFilesTableProps) {
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead
+                      key={header.id}
+                      className={header.column.columnDef.meta?.className}
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -162,9 +149,26 @@ export function SnapshotFilesTable({ data }: SnapshotFilesTableProps) {
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  onClick={() => {
+                    if (
+                      onRowClick &&
+                      (!isRowClickable || isRowClickable(row.original))
+                    ) {
+                      onRowClick(row.original);
+                    }
+                  }}
+                  className={
+                    onRowClick &&
+                    (!isRowClickable || isRowClickable(row.original))
+                      ? "cursor-pointer hover:bg-muted/50"
+                      : ""
+                  }
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell
+                      key={cell.id}
+                      className={cell.column.columnDef.meta?.className}
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()

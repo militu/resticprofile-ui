@@ -1,7 +1,9 @@
 import { fetchSnapshots } from "@/actions/fetchSnapshots";
 import { ServerConfig } from "@/types";
 import { redirect } from "next/navigation";
-import SnapshotsDisplayAlert from "./alert";
+import { Suspense } from "react";
+import DataTableAlert from "../../common/data-table-alert";
+import { DataTableSkeleton } from "../../common/data-table-skeleton";
 import { SnapshotsDisplayClient } from "./client";
 
 interface SnapshotsDisplayProps {
@@ -9,7 +11,21 @@ interface SnapshotsDisplayProps {
   profileName: string;
 }
 
-export default async function SnapshotsDisplay({
+export default function SnapshotsDisplay({
+  serverConfig,
+  profileName,
+}: SnapshotsDisplayProps) {
+  return (
+    <Suspense fallback={<DataTableSkeleton />}>
+      <SnapshotsDisplayContent
+        serverConfig={serverConfig}
+        profileName={profileName}
+      />
+    </Suspense>
+  );
+}
+
+async function SnapshotsDisplayContent({
   serverConfig,
   profileName,
 }: SnapshotsDisplayProps) {
@@ -22,7 +38,7 @@ export default async function SnapshotsDisplay({
 
   if (!snapshotsResponse.success) {
     return (
-      <SnapshotsDisplayAlert
+      <DataTableAlert
         message={snapshotsResponse.error || "Unexpected error"}
         type="error"
       />
@@ -30,7 +46,7 @@ export default async function SnapshotsDisplay({
   }
   if (!snapshotsResponse.data) {
     return (
-      <SnapshotsDisplayAlert
+      <DataTableAlert
         message="No profile configuration available"
         type="warning"
       />
@@ -38,6 +54,7 @@ export default async function SnapshotsDisplay({
   }
   return (
     <SnapshotsDisplayClient
+      title={`Browsing snapshots in profile "${profileName}"`}
       data={snapshotsResponse.data}
       onRowClick={handleRowClick}
     />
